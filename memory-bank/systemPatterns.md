@@ -16,10 +16,12 @@ Deduper follows a straightforward command-line utility architecture with the fol
 - This simplifies the user experience and aligns with the "simple and intuitive" UX goal
 - The program automatically performs scan → match → archive in one operation
 
-### Use of the `script` Library
-- Experimenting with the [script](https://github.com/bitfield/script) library for shell-like operations
-- This library simplifies file operations, command execution, and output handling
-- If it becomes unwieldy, we may revert to standard Go code
+### Standard Go Libraries
+- Primarily using standard Go libraries for file operations and path handling
+- Using the `filepath` package for cross-platform path handling
+- Using `os` package for file operations
+- Using `regexp` for pattern matching in file names
+- Limited use of the `script` library, focusing on standard Go code for clarity
 
 ### Conservative Duplicate Handling
 - Files are moved to an archive directory rather than deleted
@@ -29,13 +31,15 @@ Deduper follows a straightforward command-line utility architecture with the fol
 ### Exact Content Matching
 - Duplicates are identified by comparing the exact file contents
 - This is more reliable than using file size or other metadata
-- SHA-256 or similar hashing will be used for efficient comparison
+- Using byte-by-byte comparison for exact matching
+- SHA-256 hashing available for efficient comparison of larger files
 
 ## Design Patterns
 
-### Command Pattern
-- Different operations (scan, match, move) are encapsulated as commands
-- This allows for dry-run mode to preview actions without execution
+### Component-Based Architecture
+- Each major function is encapsulated in its own component
+- Components have clear responsibilities and interfaces
+- This allows for easy testing and maintenance
 
 ### Strategy Pattern
 - Different strategies for file matching and handling can be implemented
@@ -80,3 +84,28 @@ Deduper follows a straightforward command-line utility architecture with the fol
 2. Flag these for user attention regardless of verbosity settings
 3. Provide clear information about the discrepancy
 4. Skip these files in the automated handling process
+
+## Implementation Details
+
+### Scanner Component
+- Uses regular expressions to identify potential duplicates based on naming patterns
+- Groups files by their base name (without the number suffix)
+- Returns a list of scan results, each containing an original file and potential duplicates
+
+### Matcher Component
+- Compares file contents to confirm exact duplicates
+- Uses byte-by-byte comparison for exact matching
+- Provides SHA-256 hashing for efficient comparison of larger files
+- Supports both real filesystem and in-memory filesystem for testing
+
+### Handler Component
+- Moves confirmed duplicates to the archive directory
+- Preserves the original directory structure in the archive
+- Supports dry-run mode to preview actions without performing file moves
+- Logs all actions based on verbosity settings
+
+### Logger Component
+- Provides different logging levels (info, verbose, error)
+- Controls output based on verbosity settings
+- Ensures important messages are always shown
+- Formats error messages for clarity
