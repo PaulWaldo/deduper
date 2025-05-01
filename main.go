@@ -76,7 +76,7 @@ func main() {
 	}
 
 	// Create a matcher with the OS filesystem
-	matcher := NewMatcher(os.DirFS("."))
+	matcher := NewMatcher(os.DirFS(rootDir), rootDir)
 
 	// Confirm which potential duplicates are exact duplicates
 	logger.LogVerbose("Confirming exact duplicates...")

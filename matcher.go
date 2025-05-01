@@ -5,18 +5,21 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io/fs"
+	"path/filepath"
 )
 
 // Matcher is responsible for comparing file contents to confirm exact duplicates
 type Matcher struct {
 	// FileSystem is the filesystem to use for file operations
 	FileSystem fs.FS
+	root       string
 }
 
 // NewMatcher creates a new Matcher instance
-func NewMatcher(fileSystem fs.FS) *Matcher {
+func NewMatcher(fileSystem fs.FS, root string) *Matcher {
 	return &Matcher{
 		FileSystem: fileSystem,
+		root:       root,
 	}
 }
 
@@ -33,12 +36,20 @@ type MatchResult struct {
 // IsExactDuplicate checks if two files have exactly the same content
 func (m *Matcher) IsExactDuplicate(file1, file2 string) (bool, error) {
 	// Read the content of both files
-	content1, err := fs.ReadFile(m.FileSystem, file1)
+	relFile1, err := filepath.Rel(m.root, file1)
+	if err != nil {
+		return false, err
+	}
+	content1, err := fs.ReadFile(m.FileSystem, relFile1)
 	if err != nil {
 		return false, fmt.Errorf("failed to read file %s: %w", file1, err)
 	}
 
-	content2, err := fs.ReadFile(m.FileSystem, file2)
+	relFile2, err := filepath.Rel(m.root, file2)
+	if err != nil {
+		return false, err
+	}
+	content2, err := fs.ReadFile(m.FileSystem, relFile2)
 	if err != nil {
 		return false, fmt.Errorf("failed to read file %s: %w", file2, err)
 	}
