@@ -51,7 +51,7 @@ func TestHandlerArchivesDuplicates(t *testing.T) {
 	}
 
 	// Create a handler
-	handler := NewArchiveHandler(archiveDir)
+	handler := NewArchive(archiveDir)
 
 	// Archive the duplicates
 	err = handler.ArchiveDuplicates(matchResults, false)
@@ -130,7 +130,7 @@ func TestHandlerDryRun(t *testing.T) {
 	}
 
 	// Create a handler
-	handler := NewArchiveHandler(archiveDir)
+	handler := NewArchive(archiveDir)
 
 	// Archive the duplicates in dry-run mode
 	err = handler.ArchiveDuplicates(matchResults, true)

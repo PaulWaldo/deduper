@@ -8,16 +8,16 @@ import (
 	"path/filepath"
 )
 
-// Matcher is responsible for comparing file contents to confirm exact duplicates
-type Matcher struct {
+// Match is responsible for comparing file contents to confirm exact duplicates
+type Match struct {
 	// FileSystem is the filesystem to use for file operations
 	FileSystem fs.FS
 	root       string
 }
 
-// NewMatcher creates a new Matcher instance
-func NewMatcher(fileSystem fs.FS, root string) *Matcher {
-	return &Matcher{
+// NewMatch creates a new Matcher instance
+func NewMatch(fileSystem fs.FS, root string) *Match {
+	return &Match{
 		FileSystem: fileSystem,
 		root:       root,
 	}
@@ -34,7 +34,7 @@ type MatchResult struct {
 }
 
 // IsExactDuplicate checks if two files have exactly the same content
-func (m *Matcher) IsExactDuplicate(file1, file2 string) (bool, error) {
+func (m *Match) IsExactDuplicate(file1, file2 string) (bool, error) {
 	// Read the content of both files
 	relFile1, err := filepath.Rel(m.root, file1)
 	if err != nil {
@@ -59,7 +59,7 @@ func (m *Matcher) IsExactDuplicate(file1, file2 string) (bool, error) {
 }
 
 // ConfirmDuplicates confirms which potential duplicates are exact duplicates
-func (m *Matcher) ConfirmDuplicates(scanResults []ScanResult) ([]MatchResult, error) {
+func (m *Match) ConfirmDuplicates(scanResults []ScanResult) ([]MatchResult, error) {
 	var results []MatchResult
 
 	for _, scanResult := range scanResults {
@@ -93,7 +93,7 @@ func (m *Matcher) ConfirmDuplicates(scanResults []ScanResult) ([]MatchResult, er
 }
 
 // GetFileHash calculates the SHA-256 hash of a file's content
-func (m *Matcher) GetFileHash(filePath string) (string, error) {
+func (m *Match) GetFileHash(filePath string) (string, error) {
 	content, err := fs.ReadFile(m.FileSystem, filePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read file %s: %w", filePath, err)

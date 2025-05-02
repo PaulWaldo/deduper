@@ -1,27 +1,28 @@
 package main
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 )
 
-// Scanner is responsible for traversing directories and identifying potential duplicate files
-type Scanner struct {
+// Scan is responsible for traversing directories and identifying potential duplicate files
+type Scan struct {
 	// Root directory to scan
 	RootDir string
 	// Regular expression to identify potential duplicates
 	DuplicatePattern *regexp.Regexp
 }
 
-// NewScanner creates a new Scanner instance
-func NewScanner(rootDir string) *Scanner {
+// NewScan creates a new Scanner instance
+func NewScan(FileSystem fs.FS, root string) *Scan {
 	// Pattern to match files with a number appended before the extension
 	// e.g., "song_a 1.txt" where "song_a.txt" is the original
 	pattern := regexp.MustCompile(`^(.+) \d+(\..+)?$`)
 
-	return &Scanner{
-		RootDir:          rootDir,
+	return &Scan{
+		RootDir:          root,
 		DuplicatePattern: pattern,
 	}
 }
@@ -35,7 +36,7 @@ type ScanResult struct {
 }
 
 // Scan traverses the directory structure and returns groups of potential duplicate files
-func (s *Scanner) Scan() ([]ScanResult, error) {
+func (s *Scan) Scan() ([]ScanResult, error) {
 	var results []ScanResult
 
 	// Map to group files by their base name (without the number suffix)
@@ -107,12 +108,12 @@ func (s *Scanner) Scan() ([]ScanResult, error) {
 }
 
 // IsPotentialDuplicate checks if a file name matches the duplicate pattern
-func (s *Scanner) IsPotentialDuplicate(fileName string) bool {
+func (s *Scan) IsPotentialDuplicate(fileName string) bool {
 	return s.DuplicatePattern.MatchString(fileName)
 }
 
 // GetOriginalName returns the original file name for a potential duplicate
-func (s *Scanner) GetOriginalName(fileName string) string {
+func (s *Scan) GetOriginalName(fileName string) string {
 	if match := s.DuplicatePattern.FindStringSubmatch(fileName); match != nil {
 		originalName := match[1]
 		if match[2] != "" {

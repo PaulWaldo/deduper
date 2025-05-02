@@ -7,7 +7,7 @@ import (
 
 func TestScannerIdentifiesPotentialDuplicates(t *testing.T) {
 	// Create a scanner with the test_data directory
-	scanner := NewScanner("test_data")
+	scanner := NewScan("test_data")
 
 	// Test cases for potential duplicates
 	testCases := []struct {
@@ -44,7 +44,7 @@ func TestScannerIdentifiesPotentialDuplicates(t *testing.T) {
 
 func TestScannerFindsGroupsOfDuplicates(t *testing.T) {
 	// Use the test_data directory which contains our test files
-	scanner := NewScanner("test_data")
+	scanner := NewScan("test_data")
 
 	// Scan for potential duplicates
 	results, err := scanner.Scan()

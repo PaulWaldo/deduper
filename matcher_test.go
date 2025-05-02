@@ -16,7 +16,7 @@ func TestMatcherIdentifiesExactDuplicates(t *testing.T) {
 	}
 
 	// Create a matcher with the in-memory filesystem
-	matcher := NewMatcher(memFS, root)
+	matcher := NewMatch(memFS, root)
 
 	// Test exact duplicate detection
 	isDuplicate, err := matcher.IsExactDuplicate(
@@ -62,7 +62,7 @@ func TestMatcherConfirmsDuplicatesInScanResults(t *testing.T) {
 	}
 
 	// Create a matcher with the in-memory filesystem
-	matcher := NewMatcher(memFS, ".")
+	matcher := NewMatch(memFS, ".")
 
 	// Confirm duplicates in scan results
 	matchResults, err := matcher.ConfirmDuplicates(scanResults)

@@ -7,29 +7,29 @@ import (
 	"strings"
 )
 
-// ArchiveHandler is responsible for moving duplicate files to an archive directory
-type ArchiveHandler struct {
+// Archive is responsible for moving duplicate files to an archive directory
+type Archive struct {
 	// Archive directory where duplicates will be moved
 	ArchiveDir string
 	// Logger for output
 	Logger *Logger
 }
 
-// NewArchiveHandler creates a new ArchiveHandler instance
-func NewArchiveHandler(archiveDir string) *ArchiveHandler {
-	return &ArchiveHandler{
+// NewArchive creates a new ArchiveHandler instance
+func NewArchive(archiveDir string) *Archive {
+	return &Archive{
 		ArchiveDir: archiveDir,
 		Logger:     NewLogger(false), // Default to non-verbose
 	}
 }
 
 // SetVerbose sets the verbose mode for the handler's logger
-func (h *ArchiveHandler) SetVerbose(verbose bool) {
+func (h *Archive) SetVerbose(verbose bool) {
 	h.Logger.SetVerbose(verbose)
 }
 
 // ArchiveDuplicates moves duplicate files to the archive directory
-func (h *ArchiveHandler) ArchiveDuplicates(matchResults []MatchResult, dryRun bool) error {
+func (h *Archive) ArchiveDuplicates(matchResults []MatchResult, dryRun bool) error {
 	for _, result := range matchResults {
 		for _, duplicate := range result.Duplicates {
 			// Get the base name of the duplicate file
@@ -95,7 +95,7 @@ func (h *ArchiveHandler) ArchiveDuplicates(matchResults []MatchResult, dryRun bo
 }
 
 // moveFile moves a file from src to dst
-func (h *ArchiveHandler) moveFile(src, dst string) error {
+func (h *Archive) moveFile(src, dst string) error {
 	// Ensure the destination directory exists
 	dstDir := filepath.Dir(dst)
 	if err := os.MkdirAll(dstDir, 0755); err != nil {
