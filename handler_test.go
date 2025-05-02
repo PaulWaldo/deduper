@@ -45,7 +45,7 @@ func TestHandlerArchivesDuplicates(t *testing.T) {
 	// Create match results
 	matchResults := []MatchResult{
 		{
-			Original: originalPath,
+			Original:   originalPath,
 			Duplicates: []string{duplicate1Path, duplicate2Path},
 		},
 	}
@@ -124,7 +124,7 @@ func TestHandlerDryRun(t *testing.T) {
 	// Create match results
 	matchResults := []MatchResult{
 		{
-			Original: originalPath,
+			Original:   originalPath,
 			Duplicates: []string{duplicate1Path, duplicate2Path},
 		},
 	}

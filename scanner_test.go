@@ -11,8 +11,8 @@ func TestScannerIdentifiesPotentialDuplicates(t *testing.T) {
 
 	// Test cases for potential duplicates
 	testCases := []struct {
-		fileName string
-		isDuplicate bool
+		fileName     string
+		isDuplicate  bool
 		originalName string
 	}{
 		{"song.txt", false, "song.txt"},

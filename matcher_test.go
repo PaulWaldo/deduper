@@ -1,23 +1,28 @@
 package main
 
 import (
+	"path/filepath"
 	"testing"
 	"testing/fstest"
 )
 
 func TestMatcherIdentifiesExactDuplicates(t *testing.T) {
+	root := "."
 	// Create an in-memory filesystem
 	memFS := fstest.MapFS{
-		"original.txt":      &fstest.MapFile{Data: []byte("test content")},
-		"duplicate.txt":     &fstest.MapFile{Data: []byte("test content")},
-		"non_duplicate.txt": &fstest.MapFile{Data: []byte("different content")},
+		filepath.Join(root, "original.txt"):      &fstest.MapFile{Data: []byte("test content")},
+		filepath.Join(root, "duplicate.txt"):     &fstest.MapFile{Data: []byte("test content")},
+		filepath.Join(root, "non_duplicate.txt"): &fstest.MapFile{Data: []byte("different content")},
 	}
 
 	// Create a matcher with the in-memory filesystem
-	matcher := NewMatcher(memFS)
+	matcher := NewMatcher(memFS, root)
 
 	// Test exact duplicate detection
-	isDuplicate, err := matcher.IsExactDuplicate("original.txt", "duplicate.txt")
+	isDuplicate, err := matcher.IsExactDuplicate(
+		filepath.Join(root, "original.txt"),
+		filepath.Join(root, "original.txt"),
+	)
 	if err != nil {
 		t.Fatalf("IsExactDuplicate() returned error: %v", err)
 	}
@@ -47,13 +52,17 @@ func TestMatcherConfirmsDuplicatesInScanResults(t *testing.T) {
 	// Create mock scan results
 	scanResults := []ScanResult{
 		{
-			Original:   "artist/album/song.txt",
-			Duplicates: []string{"artist/album/song 1.txt", "artist/album/song 2.txt", "artist/album/song 3.txt"},
+			Original: "artist/album/song.txt",
+			Duplicates: []string{
+				"artist/album/song 1.txt",
+				"artist/album/song 2.txt",
+				"artist/album/song 3.txt",
+			},
 		},
 	}
 
 	// Create a matcher with the in-memory filesystem
-	matcher := NewMatcher(memFS)
+	matcher := NewMatcher(memFS, ".")
 
 	// Confirm duplicates in scan results
 	matchResults, err := matcher.ConfirmDuplicates(scanResults)
