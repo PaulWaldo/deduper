@@ -103,7 +103,7 @@ func main() {
 	logger.Info("Found %d confirmed duplicate files", totalDuplicates)
 
 	// Create a handler
-	handler := NewHandler(*archiveDir)
+	handler := NewArchiveHandler(*archiveDir)
 	handler.SetVerbose(*verbose)
 
 	// Archive the confirmed duplicates
