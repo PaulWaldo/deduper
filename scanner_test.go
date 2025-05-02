@@ -73,7 +73,7 @@ func TestScannerFindsGroupsOfDuplicates(t *testing.T) {
 	result := results[0]
 
 	// The original file should be "song_a.txt"
-	expectedOriginal := filepath.Join("test_data", "artist1", "album1", "song_a.txt")
+	expectedOriginal := filepath.Join(root, "artist1/album1/song_a.txt")
 	if result.Original != expectedOriginal {
 		t.Errorf("Original = %q, want %q", result.Original, expectedOriginal)
 	}
@@ -85,8 +85,8 @@ func TestScannerFindsGroupsOfDuplicates(t *testing.T) {
 
 	// Check that the duplicates are what we expect
 	expectedDuplicates := map[string]bool{
-		filepath.Join("test_data", "artist1", "album1", "song_a 1.txt"): true,
-		filepath.Join("test_data", "artist1", "album1", "song_a 2.txt"): true,
+		filepath.Join(root, "artist1", "album1", "song_a 1.txt"): true,
+		filepath.Join(root, "artist1", "album1", "song_a 2.txt"): true,
 	}
 
 	for _, duplicate := range result.Duplicates {

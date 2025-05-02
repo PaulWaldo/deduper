@@ -2,7 +2,6 @@ package main
 
 import (
 	"io/fs"
-	"os"
 	"path/filepath"
 	"regexp"
 )
@@ -10,13 +9,14 @@ import (
 // Scan is responsible for traversing directories and identifying potential duplicate files
 type Scan struct {
 	// Root directory to scan
-	RootDir string
+	RootDir    string
+	FileSystem fs.FS
 	// Regular expression to identify potential duplicates
 	DuplicatePattern *regexp.Regexp
 }
 
 // NewScan creates a new Scanner instance
-func NewScan(FileSystem fs.FS, root string) *Scan {
+func NewScan(fs fs.FS, root string) *Scan {
 	// Pattern to match files with a number appended before the extension
 	// e.g., "song_a 1.txt" where "song_a.txt" is the original
 	pattern := regexp.MustCompile(`^(.+) \d+(\..+)?$`)
@@ -24,6 +24,7 @@ func NewScan(FileSystem fs.FS, root string) *Scan {
 	return &Scan{
 		RootDir:          root,
 		DuplicatePattern: pattern,
+		FileSystem:       fs,
 	}
 }
 
@@ -43,13 +44,13 @@ func (s *Scan) Scan() ([]ScanResult, error) {
 	fileGroups := make(map[string][]string)
 
 	// Walk through the directory structure
-	err := filepath.Walk(s.RootDir, func(path string, info os.FileInfo, err error) error {
+	err := fs.WalkDir(s.FileSystem, s.RootDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
 		// Skip directories
-		if info.IsDir() {
+		if d.IsDir() {
 			return nil
 		}
 
@@ -122,4 +123,8 @@ func (s *Scan) GetOriginalName(fileName string) string {
 		return originalName
 	}
 	return fileName
+}
+
+func (s *Scan) GetDir() string {
+	return s.RootDir
 }

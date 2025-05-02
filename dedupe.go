@@ -1,10 +1,7 @@
 package main
 
-import (
-	"io/fs"
-)
-
 type Scanner interface {
+	DirHolder
 	Scan() ([]ScanResult, error)
 }
 
@@ -13,16 +10,21 @@ type Matcher interface {
 }
 
 type Archiver interface {
+	DirHolder
 	SetVerbose(verbose bool)
 	ArchiveDuplicates(matchResults []MatchResult, dryRun bool) error
 }
 
+type DirHolder interface {
+	GetDir() string
+}
+
 // Dedup performs duplicate file detection and archiving.
-func Dedup(scanner Scanner, matcher Matcher, archiver Archiver, rootDir string, archiveDir string, dryRun bool, verbose bool, fs fs.FS) (int, bool) {
+func Dedup(scanner Scanner, matcher Matcher, archiver Archiver, dryRun bool, verbose bool) (int, bool) {
 	logger := NewLogger(verbose)
 
-	logger.Info("Scanning directory: %s", rootDir)
-	logger.Info("Archive directory: %s", archiveDir)
+	logger.Info("Scanning directory: %s", scanner.GetDir())
+	logger.Info("Archive directory: %s", archiver.GetDir())
 	if dryRun {
 		logger.Info("Dry run mode: no files will be moved")
 	}
@@ -44,6 +46,7 @@ func Dedup(scanner Scanner, matcher Matcher, archiver Archiver, rootDir string, 
 	}
 
 	logger.LogVerbose("Confirming exact duplicates...")
+	logger.Info("Scan Results: %+V", scanResults)
 	matchResults, err := matcher.ConfirmDuplicates(scanResults)
 	if err != nil {
 		logger.Error("Failed to confirm duplicates: %v", err)
@@ -79,9 +82,9 @@ func Dedup(scanner Scanner, matcher Matcher, archiver Archiver, rootDir string, 
 	}
 
 	if dryRun {
-		logger.Info("Dry run completed. %d duplicate files would be moved to %s", totalDuplicates, archiveDir)
+		logger.Info("Dry run completed. %d duplicate files would be moved to %s", totalDuplicates, archiver.GetDir())
 	} else {
-		logger.Info("Completed. %d duplicate files moved to %s", totalDuplicates, archiveDir)
+		logger.Info("Completed. %d duplicate files moved to %s", totalDuplicates, archiver.GetDir())
 	}
 
 	if hasNonDuplicates {

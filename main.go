@@ -49,10 +49,11 @@ func main() {
 		logger.Info("Verbose mode: showing detailed information")
 	}
 
-	scanner := NewScan(rootDir)
-	matcher := NewMatch(os.DirFS(rootDir), rootDir)
-	archiver := NewArchive(*archiveDir)
-	totalDuplicates, hasNonDuplicates := Dedup(scanner, matcher, archiver, rootDir, *archiveDir, *dryRun, *verbose, os.DirFS(rootDir))
+	fs := os.DirFS(rootDir)
+	scanner := NewScan(fs, rootDir)
+	matcher := NewMatch(fs, rootDir)
+	archiver := NewArchive(*archiveDir, *verbose)
+	totalDuplicates, hasNonDuplicates := Dedup(scanner, matcher, archiver, *dryRun, *verbose)
 	if err != nil {
 		logger.Error("Failed to dedup files: %v", err)
 		os.Exit(1)
