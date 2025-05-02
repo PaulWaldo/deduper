@@ -3,11 +3,18 @@ package main
 import (
 	"path/filepath"
 	"testing"
+	"testing/fstest"
 )
 
 func TestScannerIdentifiesPotentialDuplicates(t *testing.T) {
-	// Create a scanner with the test_data directory
-	scanner := NewScan("test_data")
+	root := "."
+	memFS := fstest.MapFS{
+		filepath.Join(root, "artist1/album1/song_a.txt"):   &fstest.MapFile{Data: []byte("test content")},
+		filepath.Join(root, "artist1/album1/song_a 1.txt"): &fstest.MapFile{Data: []byte("test content")},
+		filepath.Join(root, "artist1/album1/song_a 2.txt"): &fstest.MapFile{Data: []byte("different content")},
+	}
+
+	scanner := NewScan(memFS, root)
 
 	// Test cases for potential duplicates
 	testCases := []struct {
@@ -43,8 +50,13 @@ func TestScannerIdentifiesPotentialDuplicates(t *testing.T) {
 }
 
 func TestScannerFindsGroupsOfDuplicates(t *testing.T) {
-	// Use the test_data directory which contains our test files
-	scanner := NewScan("test_data")
+	root := "."
+	memFS := fstest.MapFS{
+		filepath.Join(root, "artist1/album1/song_a.txt"):   &fstest.MapFile{Data: []byte("test content")},
+		filepath.Join(root, "artist1/album1/song_a 1.txt"): &fstest.MapFile{Data: []byte("test content")},
+		filepath.Join(root, "artist1/album1/song_a 2.txt"): &fstest.MapFile{Data: []byte("different content")},
+	}
+	scanner := NewScan(memFS, root)
 
 	// Scan for potential duplicates
 	results, err := scanner.Scan()
